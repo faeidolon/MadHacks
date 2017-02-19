@@ -1,22 +1,23 @@
 import java.sql.*;  
 import com.microsoft.sqlserver.jdbc.*;   
 
-public class uploadUser {
+public class downloadStorage {
 	
-
+	
+	//storage - stores current txt (int idNum, int playerNum, String txt) (limit = 4000);
+	
 	static int id = -9999;
-	static String username = null;
-    static String pass = null;
+    static int playerNum = -9999;
+    static String txt = null;
 	
 	
-     public uploadUser(int id, String username, String pass){
-    	 uploadUser.id = id; //unique identifier in SQL
-    	 uploadUser.username = username; //user's chosen username
-    	 uploadUser.pass = pass; //password for the user 
+     public downloadStorage(int id, int playerNum){
+    	 uploadStorage.id = id; //unique identifier in SQL
+    	 uploadStorage.playerNum = playerNum; // corresponding prompt
+    	 uploadStorage.txt = txt; //keyword to be added 
      }
 	
-	
-     	public void upload(int id, String username, String pass) {  
+     	public String download(int id, int playerNum){  
 	            String connectionString =  
 	                    "jdbc:sqlserver://testmadhacks2017.database.windows.net:1433;"  
 	                    + "database=testMADHACKS;"  
@@ -31,19 +32,14 @@ public class uploadUser {
 	            // Declare the JDBC objects.  
 	            Connection connection = null;  
 	            PreparedStatement statement = null;   
-	           // ResultSet resultSet = null;  
+	            ResultSet returned = null;  
 
 	            try {  
 	                connection = DriverManager.getConnection(connectionString);  
-	                statement = connection.prepareStatement("INSERT INTO users (id, username, pass) VALUES (?, ?, ?)");
-	                statement.setInt(1, id);
-	                statement.setString(2, username);
-	                statement.setString(3, pass);
-
-	                
-	                
-	                int resultSet = statement.executeUpdate();
-	                System.out.println(resultSet);
+	                statement = connection.prepareStatement("SELECT * from storage WHERE id = "+id);
+	               returned = statement.executeQuery();
+	               returned.next();
+	               return returned.getString("txt");
 	            }  
 	            catch (Exception e) {  
 	                e.printStackTrace();  
@@ -51,7 +47,8 @@ public class uploadUser {
 	            finally {  
 	                if (statement != null) try { statement.close(); } catch(Exception e) {}  
 	                if (connection != null) try { connection.close(); } catch(Exception e) {}  
-	            }  
+	            }
+				return null; 
 	        }  
 	    
 }

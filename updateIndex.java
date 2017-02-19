@@ -1,22 +1,24 @@
 import java.sql.*;  
 import com.microsoft.sqlserver.jdbc.*;   
 
-public class uploadUser {
+public class updateIndex {
 	
-
+	
+	//storage - stores current txt (int idNum, int playerNum, String txt) (limit = 4000);
+	
 	static int id = -9999;
-	static String username = null;
-    static String pass = null;
+    static String tableName = null;
+    static int index = -9999;
+    int tempInt = -999;
 	
 	
-     public uploadUser(int id, String username, String pass){
-    	 uploadUser.id = id; //unique identifier in SQL
-    	 uploadUser.username = username; //user's chosen username
-    	 uploadUser.pass = pass; //password for the user 
+     public updateIndex(int id, int index){
+    	 updateIndex.id = id;
+    	 updateIndex.index = index; //keyword to be added 
      }
 	
-	
-     	public void upload(int id, String username, String pass) {  
+     	@SuppressWarnings("resource")
+		public void update(int id, int index){  
 	            String connectionString =  
 	                    "jdbc:sqlserver://testmadhacks2017.database.windows.net:1433;"  
 	                    + "database=testMADHACKS;"  
@@ -31,19 +33,19 @@ public class uploadUser {
 	            // Declare the JDBC objects.  
 	            Connection connection = null;  
 	            PreparedStatement statement = null;   
-	           // ResultSet resultSet = null;  
-
+	            ResultSet returned = null; 
 	            try {  
 	                connection = DriverManager.getConnection(connectionString);  
-	                statement = connection.prepareStatement("INSERT INTO users (id, username, pass) VALUES (?, ?, ?)");
-	                statement.setInt(1, id);
-	                statement.setString(2, username);
-	                statement.setString(3, pass);
-
-	                
-	                
+	                statement = connection.prepareStatement("SELECT * from pointers WHERE id = "+id);
+	                returned = statement.executeQuery();
+	                returned.next();
+	                statement = connection.prepareStatement("UPDATE pointers SET pointVal += " + index + " WHERE id=" + returned.getInt("id"));
 	                int resultSet = statement.executeUpdate();
 	                System.out.println(resultSet);
+		           
+		             
+		               
+		               
 	            }  
 	            catch (Exception e) {  
 	                e.printStackTrace();  
