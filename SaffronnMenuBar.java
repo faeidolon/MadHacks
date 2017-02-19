@@ -1,9 +1,15 @@
-package safronn;
 
+import java.awt.Event;
+import java.time.Duration;
+
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WritableValue;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -42,7 +48,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-
 //from   ww w .  ja va 2  s  .c o  m
 public class SaffronnMenuBar extends Application {
 	// Temporarily help at two
@@ -51,6 +56,9 @@ public class SaffronnMenuBar extends Application {
 	User[] registeredUsers = new User[3];
 	String logo = "saffronnlogofullsize.jpg";
 	String backgroundImg = "backgroundpic.jpg";
+	int timer = 0;
+	BackendDriver driver = new BackendDriver();
+	
 	@Override
 	public void start(Stage primaryStage) {
 		//TODO get list of users and credentials from database 
@@ -306,6 +314,9 @@ public class SaffronnMenuBar extends Application {
 		// return scene;
 	}
 
+	public void testMethod(){
+		System.out.println("Yup it runs");
+	}
 	/**
 	 * Display the game the user is about to enter and give option to enter
 	 * @param primaryStage
@@ -349,6 +360,9 @@ public class SaffronnMenuBar extends Application {
 	 */
 	private void initGame(Stage primaryStage, BorderPane root) {
 		//TODO figure out stupid background image
+		//String storedCheck1 = downloadStorage.download(1,2); //check to see if the text has updated
+		//String storedCheck2 = downloadStorage.download(2,3);
+		//String tempStore = ""; //Checks to see if the new string accepted is the same as those above
 		root.setStyle("-fx-background-image: url('" + backgroundImg + "'); ");
 		HBox hbox = new HBox(50);
 		hbox.setTranslateX(20);
@@ -360,7 +374,7 @@ public class SaffronnMenuBar extends Application {
 		Label opponentTitle = new Label("Username vs." + opponents[0].getName()+" vs. "
 				+opponents[1].getName());
 		opponentTitle.setFont(Font.font("Helvetica", FontWeight.NORMAL, FontPosture.ITALIC, 25));
-		Label prompt = new Label("Prompt Here");
+		Label prompt = new Label("Prompt: ");
 		prompt.setFont(Font.font("Helvetica", FontWeight.BOLD, 20));
 		prompt.setWrapText(true);
 		TextArea userTextArea = new TextArea();
@@ -368,21 +382,36 @@ public class SaffronnMenuBar extends Application {
 		userTextArea.setWrapText(true);
 		userTextArea.textProperty().addListener(new ChangeListener<String>() {
 			@Override
-			public void changed(final ObservableValue<? extends String> observable, final String oldValue,
+			public void changed(final ObservableValue<? extends String> observable, String oldValue,
 					final String newValue) {
 				//send newValue to database.
-				
+				if (timer == 100){
+					timer=0;
+					
+					//Send player written data to server
+					uploadStorage.upload(BackendDriver.getNextIndex("storage"),1,userTextArea.getText()); //id, userNumber (1 for player), text to save
+					BackendDriver.updateIndex("storage");
+					//Update opponent 1
+					oldValue = downloadStorage.download(1,2);
+					if (!oldValue.equals(newValue)){
+					HBox updatedhb = new HBox(50);
+					updatedhb.setTranslateX(20);
+					updatedhb.setTranslateY(20);
+					updatedhb.getChildren().add(splitPane1);
+					root.setCenter(updateOpponents(downloadStorage.download(1,2),updatedhb,0));
+					}
+				}
+				else{
+					timer++;
+				}
 				//the following code would be implemented for opponents changing their code
-				HBox updatedhb = new HBox(50);
-				updatedhb.setTranslateX(20);
-				updatedhb.setTranslateY(20);
-				updatedhb.getChildren().add(splitPane1);
-				root.setCenter(updateOpponents(newValue,updatedhb));
+				
 			}
 		});
+
 		splitPane1.getItems().addAll(opponentTitle, prompt, userTextArea);
 		hbox.getChildren().add(splitPane1);
-		root.setCenter(updateOpponents(userTextArea.getText(), hbox));
+		root.setCenter(updateOpponents(downloadStorage.download(1,2), hbox, 0));
 		primaryStage.setScene(root.getScene());
 		//chat();
 	}
@@ -393,26 +422,8 @@ public class SaffronnMenuBar extends Application {
 	 * Temporary class to fill opponent array with data
 	 */
 	private void createOpponents() {
-		Opponent donald = new Opponent("Donald",
-				"It was the best of times, it was the worst of times, "
-						+ "it was the age of wisdom, it was the age of foolishness, it was the "
-						+ "epoch of belief, it was the epoch of incredulity, it was the season of "
-						+ "Light, it was the season of Darkness, it was the spring of hope, it was "
-						+ "the winter of despair, we had everything before us, we had nothing before "
-						+ "us, we were all going direct to Heaven, we were all going direct the other"
-						+ " way - in short, the period was so far like the present period, that some "
-						+ "of its noisiest authorities insisted on its being received, for good or "
-						+ "for evil, in the superlative degree of comparison only.");
-		Opponent chuck = new Opponent("Chuck",
-				"It was the best of times, it was the worst of times, "
-						+ "it was the age of wisdom, it was the age of foolishness, it was the "
-						+ "epoch of belief, it was the epoch of incredulity, it was the season of "
-						+ "Light, it was the season of Darkness, it was the spring of hope, it was "
-						+ "the winter of despair, we had everything before us, we had nothing before "
-						+ "us, we were all going direct to Heaven, we were all going direct the other"
-						+ " way - in short, the period was so far like the present period, that some "
-						+ "of its noisiest authorities insisted on its being received, for good or "
-						+ "for evil, in the superlative degree of comparison only.");
+		Opponent donald = new Opponent("Donald", "This is supposed to be empty");
+		Opponent chuck = new Opponent("Chuck", "This is supposed to be empty");
 		opponents[0] = donald;
 		opponents[1] = chuck;
 	}
@@ -423,8 +434,8 @@ public class SaffronnMenuBar extends Application {
 	 * @param hbox - Current box which holds opponent data
 	 * @return HBox with updated user text
 	 */
-	private HBox updateOpponents(String update, HBox hbox) {
-		opponents[0].setResponse(update);
+	private HBox updateOpponents(String update, HBox hbox, int oppNum) {
+		opponents[oppNum].setResponse(update);
 		for (int i = 0; i < opponents.length; i++) {
 			hbox.getChildren().add(createOpponentInGame(i));
 		}

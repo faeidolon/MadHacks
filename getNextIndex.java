@@ -1,23 +1,19 @@
 import java.sql.*;  
 import com.microsoft.sqlserver.jdbc.*;   
 
-public class uploadStorage {
+public class getNextIndex {
 	
 	
 	//storage - stores current txt (int idNum, int playerNum, String txt) (limit = 4000);
 	
 	static int id = -9999;
-    static int playerNum = -9999;
-    static String txt = null;
+    static String tableName = null;
+    static int index = -9999;
+    int tempInt = -999;
 	
 	
-     public uploadStorage(int idNum, int playerNum, String txt){
-    	 uploadStorage.id = idNum; //unique identifier in SQL
-    	 uploadStorage.playerNum = playerNum; // corresponding prompt
-    	 uploadStorage.txt = txt; //keyword to be added 
-     }
-	
-     	public static void upload(int id, int playerNum, String txt){  
+		@SuppressWarnings("resource")
+		public int getIndex(int id){  
 	            String connectionString =  
 	                    "jdbc:sqlserver://testmadhacks2017.database.windows.net:1433;"  
 	                    + "database=testMADHACKS;"  
@@ -32,24 +28,16 @@ public class uploadStorage {
 	            // Declare the JDBC objects.  
 	            Connection connection = null;  
 	            PreparedStatement statement = null;   
-	           // ResultSet resultSet = null;  
-
+	            ResultSet returned = null; 
 	            try {  
 	                connection = DriverManager.getConnection(connectionString);  
-
-	                // Create and execute a SELECT SQL statement.  
-	               // (id, gameType, pronptVal)
-	                //            String
-
-	                statement = connection.prepareStatement("INSERT INTO storage (id, playerNum, txt) VALUES (?, ?, ?)");
-	                statement.setInt(1, id);
-	                statement.setInt(2, playerNum);
-	                statement.setString(3, txt);
-
-	                
-	                
-	                int resultSet = statement.executeUpdate();
-	                System.out.println(resultSet);
+	                statement = connection.prepareStatement("SELECT * from pointers WHERE id = "+id);
+	                returned = statement.executeQuery();
+	                returned.next();
+	            return returned.getInt("pointVal");
+		             
+		               
+		               
 	            }  
 	            catch (Exception e) {  
 	                e.printStackTrace();  
@@ -57,7 +45,8 @@ public class uploadStorage {
 	            finally {  
 	                if (statement != null) try { statement.close(); } catch(Exception e) {}  
 	                if (connection != null) try { connection.close(); } catch(Exception e) {}  
-	            }  
+	            }
+				return -999;  
 	        }  
 	    
 }

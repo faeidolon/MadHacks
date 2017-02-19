@@ -17,7 +17,7 @@ public class downloadStorage {
     	 uploadStorage.txt = txt; //keyword to be added 
      }
 	
-     	public String download(int id, int playerNum){  
+     	public static String download(int id, int playerNum){  
 	            String connectionString =  
 	                    "jdbc:sqlserver://testmadhacks2017.database.windows.net:1433;"  
 	                    + "database=testMADHACKS;"  

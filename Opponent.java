@@ -1,4 +1,3 @@
-package safronn;
 
 public class Opponent {
 	String name, response;
