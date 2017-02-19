@@ -28,10 +28,14 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -43,19 +47,24 @@ import javafx.stage.Stage;
 public class SaffronnMenuBar extends Application {
 	// Temporarily help at two
 	Opponent[] opponents = new Opponent[2];
-
+	//User class declared privately at bottom of class
+	User[] registeredUsers = new User[3];
+	String logo = "saffronnlogofullsize.jpg";
+	String backgroundImg = "backgroundpic.jpg";
 	@Override
 	public void start(Stage primaryStage) {
+		//TODO get list of users and credentials from database 
+		//and store as public variable
 		initLogin(primaryStage);
 		primaryStage.show();
 
 	}
-	/*
-	 * Send Username and Password to database and check 
+	/**
+	 * Send username and password to be checked in database
+	 * @param primaryStage - Basically the window
 	 */
 	public void initLogin(Stage primaryStage) {
 		primaryStage.setTitle("Saffronn");
-		// hidden allignment.
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);
@@ -80,16 +89,16 @@ public class SaffronnMenuBar extends Application {
 		PasswordField pwBox = new PasswordField();
 		grid.add(pwBox, 1, 2);
 
-		Button btn = new Button("Sign in");
+		Button signInButton = new Button("Sign in");
 		HBox hbBtn = new HBox(10);
 		hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-		hbBtn.getChildren().add(btn);
+		hbBtn.getChildren().add(signInButton);
 		grid.add(hbBtn, 1, 4);
 
 		final Text actiontarget = new Text();
 		grid.add(actiontarget, 1, 6);
 
-		btn.setOnAction(new EventHandler<ActionEvent>() {
+		signInButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent e) {
@@ -97,20 +106,87 @@ public class SaffronnMenuBar extends Application {
 				initMenuBar(primaryStage);
 			}
 		});
-		//create account button here
+		//TODO create account button
+		/*Button createAccountButton = new Button("Create Account");
+		HBox caBtn = new HBox(10);
+		caBtn.setAlignment(Pos.BOTTOM_LEFT);
+		caBtn.getChildren().add(createAccountButton);
+		grid.add(caBtn, 1, 4);
+
+		createAccountButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				actiontarget.setFill(Color.FIREBRICK);
+				initMenuBar(primaryStage);
+			}
+		});
+		*/
 		primaryStage.setScene(scene);
 	}
+	/**
+	 * Class to upload new logins to database
+	 * We will probably not use this
+	 * @param primaryStage
+	 */
+	public void initCreateLogin(Stage primaryStage) {
+		// hidden allignment.
+		GridPane grid = new GridPane();
+		grid.setAlignment(Pos.CENTER);
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(25, 25, 25, 25));
 
+		Scene scene = new Scene(grid, 1400, 875);
+
+		Text scenetitle = new Text("Saffronn");
+		scenetitle.setFont(Font.font("Helvetica", FontWeight.NORMAL, 35));
+		grid.add(scenetitle, 0, 0, 2, 1);
+
+		Label userName = new Label("Set User Name:");
+		grid.add(userName, 0, 1);
+
+		TextField userTextField = new TextField();
+		grid.add(userTextField, 1, 1);
+
+		Label pw = new Label("Set Password:");
+		grid.add(pw, 0, 2);
+
+		PasswordField pwBox = new PasswordField();
+		grid.add(pwBox, 1, 2);
+
+		Button createAccountButton = new Button("Create Account");
+		HBox caBtn = new HBox(10);
+		caBtn.setAlignment(Pos.BOTTOM_RIGHT);
+		caBtn.getChildren().add(createAccountButton);
+		grid.add(caBtn, 1, 4);
+
+		createAccountButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				//TODO send new credentials to database
+				//switch back to login screen here
+				initLogin(primaryStage);
+			}
+		});
+
+		primaryStage.setScene(scene);
+	}
+	/**
+	 * Bar on top of screen with drop down options
+	 * @param primaryStage
+	 */
 	private void initMenuBar(Stage primaryStage) {
 		BorderPane root = new BorderPane();
-		//Don't delete stupid
+		
+		root.setStyle("-fx-background-image: url("+backgroundImg+");");
+		//Don't delete this stupid
 		Scene scene = new Scene(root, 1400, 875, Color.WHITE);
 
 		MenuBar menuBar = new MenuBar();
 		menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
 		root.setTop(menuBar);
 
-		// File menu - new, save, exit
+		// File menu - Game, Player, Options, Help
 		Menu newGameMenu = new Menu("Game");
 		MenuItem newMenuItem = new MenuItem("Multiplayer");
 		newMenuItem.setOnAction(actionEvent -> initScenes(primaryStage, root));
@@ -163,9 +239,14 @@ public class SaffronnMenuBar extends Application {
 		Label welcome = new Label("Welcome to Saffronn. Select an Option from the Menu");
 		welcome.setFont(Font.font("Helvetica", FontWeight.BOLD, FontPosture.ITALIC, 45));
 		root.setCenter(welcome);
-
+		
 		primaryStage.setScene(root.getScene());
 	}
+	/**
+	 * Acts like we're waiting for a game then pulls up section to enter the game
+	 * @param primaryStage
+	 * @param root - drawing on here. Keeps the menubar through different windows
+	 */
 	private void initScenes(Stage primaryStage, BorderPane root){
 		initWaitingScene(primaryStage, root);
 		
@@ -188,6 +269,11 @@ public class SaffronnMenuBar extends Application {
         new Thread(sleeper).start();
         
 	}
+	/**
+	 * Waiting for a game to be found
+	 * @param primaryStage
+	 * @param root
+	 */
 	private void initWaitingScene(Stage primaryStage, BorderPane root) {
 		// hidden allignment.
 		
@@ -195,7 +281,7 @@ public class SaffronnMenuBar extends Application {
 		splitPane1.setOrientation(Orientation.VERTICAL);
 		splitPane1.setPrefSize(400, 400);
 		Label wait = new Label("Please Wait While We Search for Games");
-		wait.setFont(Font.font("Helvetica", FontWeight.BOLD, FontPosture.ITALIC, 45));
+		wait.setFont(Font.font("Helvetica", FontWeight.BOLD, FontPosture.ITALIC,45));
 		Label games = new Label("Searching...");
 		games.setFont(Font.font("Helvetica", FontWeight.BOLD, 35));
 		Button r1 = new Button("Join Game");
@@ -212,14 +298,19 @@ public class SaffronnMenuBar extends Application {
 		hb.setScaleX(5);
 		hb.setScaleY(5);
 		hb.setTranslateY(-300);
-		root.setStyle("-fx-box-border: transparent;");
+		//TODO figure out background image
+		root.setStyle("-fx-box-border: transparent;"
+				+"-fx-background-image: url("+backgroundImg+");");
 		root.setBottom(hb);
 		primaryStage.setScene(root.getScene());
 		// return scene;
 	}
 
-	// add game deets as parameter
-	// add opponent array as parameter
+	/**
+	 * Display the game the user is about to enter and give option to enter
+	 * @param primaryStage
+	 * @param root
+	 */
 	private void initGameAvailable(Stage primaryStage, BorderPane root) {
 		root.setBottom(null);
 		createOpponents();
@@ -250,8 +341,15 @@ public class SaffronnMenuBar extends Application {
 
 	// make hard coded stuff into variables
 	// Like: Opponent, username,prompt, opponent array)
+	/**
+	 * Start the game. Still need a timer function
+	 * TODO multithread querying the database to find changes then updating the program
+	 * @param primaryStage
+	 * @param root
+	 */
 	private void initGame(Stage primaryStage, BorderPane root) {
-		root.setStyle(null);
+		//TODO figure out stupid background image
+		root.setStyle("-fx-background-image: url('" + backgroundImg + "'); ");
 		HBox hbox = new HBox(50);
 		hbox.setTranslateX(20);
 		hbox.setTranslateY(20);
@@ -289,11 +387,11 @@ public class SaffronnMenuBar extends Application {
 		//chat();
 	}
 
-	private void chat() {
-		new Chat("Billy");
-	}
+	//TODO Implement the chat class with real time. Do after server stuff
 
-	// temporary
+	/**
+	 * Temporary class to fill opponent array with data
+	 */
 	private void createOpponents() {
 		Opponent donald = new Opponent("Donald",
 				"It was the best of times, it was the worst of times, "
@@ -318,8 +416,12 @@ public class SaffronnMenuBar extends Application {
 		opponents[0] = donald;
 		opponents[1] = chuck;
 	}
-	/*
-	 * Update opponent's text when there is a change in the database
+	/**
+	 * Update the opponents text. Ideally this would be call after
+	 * every time the database is queried
+	 * @param update - Updated String typed by user
+	 * @param hbox - Current box which holds opponent data
+	 * @return HBox with updated user text
 	 */
 	private HBox updateOpponents(String update, HBox hbox) {
 		opponents[0].setResponse(update);
@@ -328,7 +430,13 @@ public class SaffronnMenuBar extends Application {
 		}
 		return hbox;
 	}
-
+	/**
+	 * Creates a @SplitPane for an individual opponent.
+	 * Ideally this method would be called from a for loop
+	 * looping over every opponent
+	 * @param i - index of opponent in opponent array
+	 * @return - @SplitPane of opponent and associated data
+	 */
 	private SplitPane createOpponentInGame(int i) {
 		SplitPane splitPane2 = new SplitPane();
 		splitPane2.setOrientation(Orientation.VERTICAL);
@@ -340,7 +448,25 @@ public class SaffronnMenuBar extends Application {
 		splitPane2.getItems().addAll(opponentName, opponentText);
 		return splitPane2;
 	}
-
+	/**
+	 * Ideally instantiated with data from database about every user at beginning
+	 * @author samcw
+	 *
+	 */
+	private class User{
+		private String username;
+		private String password;
+		public User(String username, String password){
+			this.username = username;
+			this.password = password;
+		}
+		public String getUsername(){
+			return username;
+		}
+		public String getPassword(){
+			return password;
+		}
+	}
 	public static void main(String[] args) {
 		launch(args);
 	}
