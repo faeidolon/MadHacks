@@ -8,7 +8,7 @@ public class DownloadUsername {
 	
 	static int id = -9999;
     
-		public String download(int id){  
+		public static String download(int id){  
 	            String connectionString =  
 	                    "jdbc:sqlserver://testmadhacks2017.database.windows.net:1433;"  
 	                    + "database=testMADHACKS;"  

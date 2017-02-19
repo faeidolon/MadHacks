@@ -53,7 +53,7 @@ public class SaffronnMenuBar extends Application {
 	// Temporarily help at two
 	Opponent[] opponents = new Opponent[2];
 	//User class declared privately at bottom of class
-	User[] registeredUsers = new User[3];
+	User[] registeredUsers = new User[3]; //0 is not filled
 	String logo = "saffronnlogofullsize.jpg";
 	String backgroundImg = "backgroundpic.jpg";
 	int timer = 0;
@@ -61,8 +61,20 @@ public class SaffronnMenuBar extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
-		//TODO get list of users and credentials from database 
+		
+		
+		// NOW POPULATES!
+		//get list of users and credentials from database 
 		//and store as public variable
+		//System.out.println(BackendDriver.getNextIndex("users"));
+		for (int i=1; i<=BackendDriver.getNextIndex("users"); i++){
+			registeredUsers[i] = new User(DownloadUsername.download(i), DownloadPass.download(i));
+			//System.out.println(DownloadUsername.download(i));
+		}
+	
+		//System.out.println(registeredUsers[1].getUsername());
+		//System.out.println(registeredUsers[2].getUsername());
+		
 		initLogin(primaryStage);
 		primaryStage.show();
 
@@ -115,7 +127,7 @@ public class SaffronnMenuBar extends Application {
 			}
 		});
 		//TODO create account button
-		/*Button createAccountButton = new Button("Create Account");
+		Button createAccountButton = new Button("Create Account");
 		HBox caBtn = new HBox(10);
 		caBtn.setAlignment(Pos.BOTTOM_LEFT);
 		caBtn.getChildren().add(createAccountButton);
@@ -125,10 +137,11 @@ public class SaffronnMenuBar extends Application {
 			@Override
 			public void handle(ActionEvent e) {
 				actiontarget.setFill(Color.FIREBRICK);
+				initCreateLogin(primaryStage);
 				initMenuBar(primaryStage);
 			}
 		});
-		*/
+		
 		primaryStage.setScene(scene);
 	}
 	/**
@@ -171,7 +184,9 @@ public class SaffronnMenuBar extends Application {
 		createAccountButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent e) {
-				//TODO send new credentials to database
+				// send new credentials to database
+				BackendDriver.upUser.upload(BackendDriver.getNextIndex("users"), userName.getText(), pwBox.getText());
+				BackendDriver.updateIndex("users");
 				//switch back to login screen here
 				initLogin(primaryStage);
 			}
