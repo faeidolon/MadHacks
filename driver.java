@@ -25,11 +25,14 @@ public class driver {
 	static downloadStorage downStore = new downloadStorage(-999999, -999999); //storage - stores current text (int idNum, int playerNum, String text) (limit = 4000);
 	static downloadKey downKey = new downloadKey(-99999, -999999);
 	static DownloadPrompt downPrompt = new DownloadPrompt(-9999);
+	static DownloadUsername downUser = new DownloadUsername();
+	static DownloadPass downPass = new DownloadPass();
 	
 	
 	
 	public static void main(String[] args) {
-	
+		System.out.println(downloadUser(1));
+		System.out.println(downloadPass(1));
 	}
 
 	
@@ -64,6 +67,16 @@ public class driver {
 		return downPrompt.download(gameType);
 	}
 	
+	public static String downloadUser(int id){
+		return downUser.download(id);
+	}
+	
+	public static String downloadPass(int id){
+		return downPass.download(id);
+	}
+	
+	
+	
 	public void setPlayerID(){
 		//TODO: pull the unique id from the user's name
 		playerNum = 1;
@@ -80,6 +93,9 @@ public class driver {
 		}
 	
 	}
+	
+	
+	
 	
 	
 	
